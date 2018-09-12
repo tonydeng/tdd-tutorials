@@ -17,7 +17,8 @@ public class GreeterTest {
 
     @Test
     public void testShouldSayHelloToTheWorld() {
-        Assertions.assertNotNull(greeter.sayHello());
-        Assertions.assertEquals("Hello World", greeter.sayHello());
+        String name = "World";
+        Assertions.assertNotNull(greeter.sayHello(name));
+        Assertions.assertEquals("Hello World", greeter.sayHello(name));
     }
 }
