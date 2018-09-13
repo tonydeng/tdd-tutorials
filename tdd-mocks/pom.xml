@@ -9,11 +9,18 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.github.tonydeng.tutorials.tdd</groupId>
-    <artifactId>tdd-helloworld</artifactId>
+    <artifactId>tdd-mocks</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>tdd-helloworld</name>
+    <name>tdd-mocks</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+        </dependency>
     </dependencies>
 </project>
