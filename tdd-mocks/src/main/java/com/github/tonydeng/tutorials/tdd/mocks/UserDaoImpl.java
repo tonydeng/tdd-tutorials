@@ -20,6 +20,6 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
 
     @Override
     public User newUser() {
-        return null;
+        return new UserImpl();
     }
 }

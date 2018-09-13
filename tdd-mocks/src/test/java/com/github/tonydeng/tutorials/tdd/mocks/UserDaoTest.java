@@ -18,10 +18,15 @@ public class UserDaoTest {
 
     @Test
     public void testNewUser() {
-//        UserDao userDao = new UserDaoImpl(jdbcConf);
-//
-//        User user = userDao.newUser();
-//
-//        Assertions.assertNotNull(user);
+        UserDao userDao = new UserDaoImpl(jdbcConf);
+
+        User user = userDao.newUser();
+        Assertions.assertNotNull(user);
+        user.setUsername("tonydeng");
+        user.setPassword("123456");
+
+        userDao.saveOrUpdate(user);
+
+        Assertions.assertNotNull(user.getId());
     }
 }
