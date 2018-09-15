@@ -12,11 +12,12 @@ public class JdbcConfTest {
     @BeforeAll
     public static void init() {
         jc = new JdbcConf("driver", "", "", "");
+        log.info("jdbc conf : '{}'",jc);
     }
 
     @Test
     public void testCreateJdbcConfTest() {
-        Assertions.assertEquals("driver", jc.getDriverName());
+        Assertions.assertEquals("drive", jc.getDriverName());
         log.info("{}", jc.getDriverName());
     }
 }
