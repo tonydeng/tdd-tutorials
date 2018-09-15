@@ -17,7 +17,7 @@ public class JdbcConfTest {
 
     @Test
     public void testCreateJdbcConfTest() {
-        Assertions.assertEquals("drive", jc.getDriverName());
+        Assertions.assertEquals("driver", jc.getDriverName());
         log.info("{}", jc.getDriverName());
     }
 }
