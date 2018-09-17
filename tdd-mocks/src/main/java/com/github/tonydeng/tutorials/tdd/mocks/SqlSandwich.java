@@ -16,10 +16,9 @@ public abstract class SqlSandwich<T> {
             Class.forName(jdbcConf.getDriverName());
             return withConnection(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
-            log.error("{}", e.getStackTrace());
+            log.error("execute sql error", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("execute error", e);
         }
         return null;
     }
