@@ -28,6 +28,7 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
             @Override
             Void withConnection(Connection conn) {
                 PreparedStatement ps = null;
+                ResultSet resultSet = null;
                 try {
 
                     if (Objects.nonNull(user.getId())) {
@@ -47,18 +48,25 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
                         ps.setString(2, getEncryptedPassword(user.getPassword()));
                         ps.setBoolean(3, user.isLocked());
                         ps.executeUpdate();
-                        ResultSet generatedKeys = ps.getGeneratedKeys();
-                        generatedKeys.next();
-                        user.setId(generatedKeys.getLong(1));
+                        resultSet = ps.getGeneratedKeys();
+                        resultSet.next();
+                        user.setId(resultSet.getLong(1));
                     }
                 } catch (SQLException e) {
                     log.error("execute sql error", e);
                 } finally {
-                    if (null != ps) {
+                    if (Objects.nonNull(ps)) {
                         try {
                             ps.close();
                         } catch (SQLException e) {
                             log.error("close PreparedStatement error", e);
+                        }
+                    }
+                    if (Objects.nonNull(resultSet)) {
+                        try {
+                            resultSet.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
