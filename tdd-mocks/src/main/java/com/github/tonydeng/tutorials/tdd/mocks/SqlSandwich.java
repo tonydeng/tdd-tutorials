@@ -23,5 +23,5 @@ public abstract class SqlSandwich<T> {
         return null;
     }
 
-    abstract T withConnection(Connection connection) throws Exception;
+    abstract T withConnection(Connection connection);
 }

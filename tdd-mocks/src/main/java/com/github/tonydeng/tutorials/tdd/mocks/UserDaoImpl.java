@@ -6,6 +6,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 @Slf4j
@@ -25,27 +26,43 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         new SqlSandwich<Void>() {
 
             @Override
-            Void withConnection(Connection conn) throws Exception {
-                PreparedStatement ps;
-                if (Objects.nonNull(user.getId())) {
-                    ps = conn.prepareStatement("UPDATE TDD_USER SET username=?, password=?,is_locked=? WHERE id=?");
-                    ps.setString(1, user.getUsername());
-                    ps.setString(2, DigestUtils.md2Hex(user.getPassword()));
-                    ps.setBoolean(3, user.isLocked());
-                    ps.setLong(4, user.getId());
+            Void withConnection(Connection conn) {
+                PreparedStatement ps = null;
+                try {
 
-                    ps.executeUpdate();
-                } else {
-                    ps = conn.prepareStatement("INSERT INTO TDD_USER (username,password,is_locked) VALUES(?, ?, ?)",
-                            java.sql.Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1, user.getUsername());
-                    ps.setString(2, DigestUtils.md5Hex(user.getPassword()));
-                    ps.setBoolean(3, user.isLocked());
-                    ps.executeUpdate();
-                    ResultSet generatedKeys = ps.getGeneratedKeys();
-                    generatedKeys.next();
-                    user.setId(generatedKeys.getLong(1));
+                    if (Objects.nonNull(user.getId())) {
+                        String sql = "UPDATE TDD_USER SET username=?, `password`=?,is_locked=? WHERE id=?";
+                        ps = conn.prepareStatement(sql);
+                        ps.setString(1, user.getUsername());
+                        ps.setString(2, getEncryptedPassword(user.getPassword()));
+                        ps.setBoolean(3, user.isLocked());
+                        ps.setLong(4, user.getId());
+                        ps.executeUpdate();
+                    } else {
+                        String sql = "INSERT INTO TDD_USER (username,password,is_locked) VALUES(?, ?, ?)";
+
+                        ps = conn.prepareStatement(sql,
+                                java.sql.Statement.RETURN_GENERATED_KEYS);
+                        ps.setString(1, user.getUsername());
+                        ps.setString(2, getEncryptedPassword(user.getPassword()));
+                        ps.setBoolean(3, user.isLocked());
+                        ps.executeUpdate();
+                        ResultSet generatedKeys = ps.getGeneratedKeys();
+                        generatedKeys.next();
+                        user.setId(generatedKeys.getLong(1));
+                    }
+                } catch (SQLException e) {
+                    log.error("execute sql error", e);
+                } finally {
+                    if (null != ps) {
+                        try {
+                            ps.close();
+                        } catch (SQLException e) {
+                            log.error("close PreparedStatement error", e);
+                        }
+                    }
                 }
+
                 return null;
             }
         }.execute(jdbcConf);
@@ -54,5 +71,9 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
     @Override
     public User newUser() {
         return new UserImpl();
+    }
+
+    private String getEncryptedPassword(String password) {
+        return DigestUtils.md5Hex(password);
     }
 }
