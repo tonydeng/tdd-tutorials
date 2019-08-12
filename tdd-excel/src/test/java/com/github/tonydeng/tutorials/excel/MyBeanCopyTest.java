@@ -31,7 +31,7 @@ public class MyBeanCopyTest {
     }
 
     @Test
-    void test() {
+    void testConvert() {
         int index = 2;
         List<A> aList = Lists.newArrayList();
         for (int i = 0; i < index; i++) {
