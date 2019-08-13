@@ -7,11 +7,16 @@ import com.github.tonydeng.tutorials.excel.listen.ExcelListener;
 import com.github.tonydeng.tutorials.excel.model.ReadModel;
 import com.github.tonydeng.tutorials.excel.model.ReadModel2;
 import com.github.tonydeng.tutorials.excel.utils.FileUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class ExcelReadTest {
@@ -68,17 +73,16 @@ public class ExcelReadTest {
             List<Sheet> sheets = reader.getSheets();
             log.info("sheets {}", sheets);
             for (Sheet sheet : sheets) {
-                switch (sheet.getSheetNo()){
-                    case 1:
-                        reader.read(sheet);
-                    case 2:
-                        sheet.setHeadLineMun(1);
-                        sheet.setClazz(ReadModel.class);
-                        reader.read(sheet);
-                    case 3:
-                        sheet.setHeadLineMun(1);
-                        sheet.setClazz(ReadModel2.class);
-                        reader.read(sheet);
+                if(1 == sheet.getSheetNo()){
+                    reader.read(sheet);
+                }else if (2 == sheet.getSheetNo()){
+                    sheet.setHeadLineMun(1);
+                    sheet.setClazz(ReadModel.class);
+                    reader.read(sheet);
+                }else if(3 == sheet.getSheetNo()){
+                    sheet.setHeadLineMun(1);
+                    sheet.setClazz(ReadModel2.class);
+                    reader.read(sheet);
                 }
             }
         } catch (IOException e) {
@@ -86,7 +90,28 @@ public class ExcelReadTest {
         }
     }
 
-    private void print(List<Object> datas) {
-        datas.forEach(d -> log.info("{}", d));
+    /**
+     * 03版本excel读数据量少于1千行数据，内部采用回调方法.
+     *
+     * @throws IOException 简单抛出异常，真实环境需要catch异常,同时在finally中关闭流
+     */
+    @Test
+    public void testSimpleReadListStringV2003() throws IOException {
+        try (InputStream is = FileUtils.getResourcesFileInputStream("2003.xls")) {
+            List<Object> data = EasyExcelFactory.read(is, new Sheet(1, 0));
+            assertNotNull(data);
+            assertEquals(220,data.size());
+            print(data);
+        } catch (IOException e) {
+            log.error("testSimpleReadListStringV2003 error", e);
+        }
+        InputStream inputStream = FileUtils.getResourcesFileInputStream("2003.xls");
+        List<Object> data = EasyExcelFactory.read(inputStream, new Sheet(1, 0));
+        inputStream.close();
+        print(data);
+    }
+
+    private void print(List<Object> data) {
+        data.forEach(d -> log.info("{}", d));
     }
 }
